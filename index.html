@@ -665,6 +665,131 @@
             background: var(--bg-tertiary);
         }
 
+        /* Plan Table Styles */
+        .plan-table thead {
+            background: var(--bg-tertiary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .plan-table th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .plan-table td {
+            padding: 14px 12px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .plan-table tbody tr {
+            transition: all 0.2s;
+        }
+
+        .plan-table tbody tr:hover {
+            background: var(--bg-tertiary);
+            transform: scale(1.002);
+        }
+
+        .plan-table .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .plan-table .status-badge.income {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .plan-table .status-badge.expense {
+            background: rgba(148, 163, 184, 0.15);
+            color: var(--text-secondary);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .plan-table .status-badge.debt {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .plan-table .status-badge.savings {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--info);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .plan-table .amount-cell {
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        .plan-table .amount-cell.positive {
+            color: var(--success);
+        }
+
+        .plan-table .amount-cell.negative {
+            color: var(--danger);
+        }
+
+        .plan-table .balance-cell {
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+        }
+
+        .plan-table .milestone-row {
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Month Filter Buttons */
+        .month-filter-btn {
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .month-filter-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .month-filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .month-filter-btn[data-month="all"].active {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
         /* Pagination */
         .pagination {
             display: flex;
@@ -951,6 +1076,9 @@
             <button class="nav-tab" data-view="meals" onclick="switchView('meals')">
                 🍽️ MEALS
             </button>
+            <button class="nav-tab" data-view="plan" onclick="switchView('plan')">
+                📋 PLAN
+            </button>
         </div>
 
         <!-- DASHBOARD VIEW -->
@@ -1211,6 +1339,84 @@
                 </div>
             </div>
         </div>
+
+        <!-- PLAN VIEW -->
+        <div id="planView" class="view-section">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                    <h2 style="margin: 0;">📋 Financial Recovery Plan</h2>
+                    <div style="color: var(--text-secondary); font-size: 14px;">
+                        <span style="color: var(--success);">●</span> Income/Savings &nbsp;
+                        <span style="color: var(--danger);">●</span> Debt &nbsp;
+                        <span style="color: var(--text-secondary);">●</span> Expense
+                    </div>
+                </div>
+
+                <div class="alert alert-info" style="margin-bottom: 24px;">
+                    <strong>🎯 Goal:</strong> Move out by <strong>August 1, 2026</strong> with <strong>$4,025.91 checking</strong> and <strong>$3,000 savings</strong>. All debts cleared!
+                </div>
+
+                <!-- Month Filter Toggles -->
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <span style="font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase;">Filter by Month:</span>
+                        <div class="month-filters" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="month-filter-btn active" data-month="all" onclick="togglePlanMonth('all')">
+                                📅 ALL
+                            </button>
+                            <button class="month-filter-btn" data-month="2026-02" onclick="togglePlanMonth('2026-02')">
+                                Feb 2026
+                            </button>
+                            <button class="month-filter-btn" data-month="2026-03" onclick="togglePlanMonth('2026-03')">
+                                Mar 2026
+                            </button>
+                            <button class="month-filter-btn" data-month="2026-04" onclick="togglePlanMonth('2026-04')">
+                                Apr 2026
+                            </button>
+                            <button class="month-filter-btn" data-month="2026-05" onclick="togglePlanMonth('2026-05')">
+                                May 2026
+                            </button>
+                            <button class="month-filter-btn" data-month="2026-06" onclick="togglePlanMonth('2026-06')">
+                                Jun 2026
+                            </button>
+                            <button class="month-filter-btn" data-month="2026-07" onclick="togglePlanMonth('2026-07')">
+                                Jul 2026
+                            </button>
+                            <button class="month-filter-btn" data-month="2026-08" onclick="togglePlanMonth('2026-08')">
+                                Aug 2026
+                            </button>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="clearPlanFilters()">
+                            🗑️ Clear Filters
+                        </button>
+                    </div>
+                    <div id="planFilterSummary" style="margin-top: 10px; font-size: 13px; color: var(--text-secondary);">
+                        Showing all months
+                    </div>
+                </div>
+
+                <div class="item-list">
+                    <div style="overflow-x: auto;">
+                        <table class="plan-table" style="width: 100%; min-width: 900px;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left; padding: 12px; white-space: nowrap;">📅 Date</th>
+                                    <th style="text-align: center; padding: 12px;">Status</th>
+                                    <th style="text-align: left; padding: 12px;">Item</th>
+                                    <th style="text-align: right; padding: 12px;">Amount</th>
+                                    <th style="text-align: left; padding: 12px;">Notes</th>
+                                    <th style="text-align: right; padding: 12px; white-space: nowrap;">💰 Balance</th>
+                                    <th style="text-align: right; padding: 12px; white-space: nowrap;">💎 Savings</th>
+                                </tr>
+                            </thead>
+                            <tbody id="planTableBody">
+                                <tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-secondary);">Loading plan...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal for Actions -->
@@ -1281,7 +1487,11 @@
             allDateNights: [],
             allMealIdeas: [],
             activeShoppingList: null,
-            unsubscribe: null
+            unsubscribe: null,
+            planFilters: {
+                selectedMonths: ['all'],
+                planData: null
+            }
         };
 
         // Initialize app
@@ -1544,6 +1754,8 @@
                 updateDatesView();
             } else if (view === 'meals') {
                 updateMealsView();
+            } else if (view === 'plan') {
+                updatePlanView();
             }
         };
 
@@ -2984,6 +3196,257 @@
             window.appState.activeShoppingList = null;
             updateMealsView();
         };
+
+        // Update Plan View - Render Financial Recovery Plan
+        function updatePlanView() {
+            const planData = [
+                { date: '2026-02-27', status: 'INCOME', item: 'SignatureAce Monthly Pay', amount: 2728.12, notes: 'End of Month Cheque (FEB)', balance: 2728.12, savings: 0 },
+                { date: '2026-02-27', status: 'EXPENSE', item: 'Car Insurance (Catch-up)', amount: 450, notes: 'Monthly Car Insurance (Missing Month)', balance: 2278.12, savings: 0 },
+                { date: '2026-02-27', status: 'EXPENSE', item: 'Gas', amount: 240, notes: 'Monthly Gas Usage', balance: 2030.12, savings: 0 },
+                { date: '2026-02-27', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'Half month weed purchase (1oz)', balance: 1958.12, savings: 0 },
+                { date: '2026-02-27', status: 'EXPENSE', item: 'Night Out #1', amount: 300, notes: '1/2 "Big" nights out - dinner + event', balance: 1658.12, savings: 0 },
+                { date: '2026-02-27', status: 'EXPENSE', item: 'Grocery', amount: 300, notes: 'Monthly Grocery Expense', balance: 1358.12, savings: 0 },
+                { date: '2026-02-27', status: 'DEBT', item: 'SCOTIA BANK CC', amount: 962, notes: 'Debt Balancing (80% Payment) - $404 left', balance: 396.12, savings: 0 },
+                { date: '2026-02-27', status: 'SAVINGS', item: 'MONTHLY SAVINGS DEPOSIT', amount: 150, notes: 'Monthly Savings Deposit', balance: 246.12, savings: 150 },
+                { date: '2026-03-06', status: 'EXPENSE', item: 'Night Out #2', amount: 150, notes: '1/2 "Big" nights out - dinner', balance: 96.12, savings: 150 },
+                { date: '2026-03-15', status: 'INCOME', item: 'SignatureAce Advance', amount: 1000, notes: 'Mid Month Advance', balance: 1096.12, savings: 150 },
+                { date: '2026-03-15', status: 'INCOME', item: 'SignatureAce Vacation Pay', amount: 800, notes: 'VACATION PAY', balance: 1896.12, savings: 150 },
+                { date: '2026-03-15', status: 'EXPENSE', item: 'Car Insurance', amount: 450, notes: 'Monthly Car Insurance', balance: 1446.12, savings: 150 },
+                { date: '2026-03-15', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'Half month weed purchase (1oz)', balance: 1366.12, savings: 150 },
+                { date: '2026-03-15', status: 'EXPENSE', item: 'Vape', amount: 60, notes: 'E-Juice Purchase', balance: 1306.12, savings: 150 },
+                { date: '2026-03-15', status: 'EXPENSE', item: 'Night Out #1', amount: 150, notes: 'Dinner Out', balance: 1156.12, savings: 150 },
+                { date: '2026-03-15', status: 'SAVINGS', item: 'MONTHLY SAVINGS DEPOSIT', amount: 100, notes: 'Monthly Savings Deposit #2', balance: 1056.12, savings: 250 },
+                { date: '2026-03-27', status: 'EXPENSE', item: 'Night Out #2', amount: 150, notes: 'Dinner Out', balance: 906.12, savings: 250 },
+                { date: '2026-03-31', status: 'DEBT', item: 'MOGO LOAN', amount: 396, notes: 'CLOSE ACCOUNT (DEBT CLEARED)', balance: 510.12, savings: 250 },
+                { date: '2026-03-31', status: 'DEBT', item: 'SCOTIA BANK CC', amount: 404, notes: 'ACCOUNT BALANCED (DEBT CLEAR)', balance: 106.12, savings: 250 },
+                { date: '2026-03-31', status: 'INCOME', item: 'SignatureAce Monthly Pay', amount: 3228.12, notes: 'End of Month Cheque (MAR)', balance: 3334.24, savings: 250 },
+                { date: '2026-03-31', status: 'EXPENSE', item: 'Gas', amount: 120, notes: 'HALF MONTH GAS', balance: 3214.24, savings: 250 },
+                { date: '2026-03-31', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'HALF MONTH WEED (1 OZ)', balance: 3134.24, savings: 250 },
+                { date: '2026-03-31', status: 'EXPENSE', item: 'Grocery', amount: 300, notes: 'Monthly Grocery Expense', balance: 2834.24, savings: 250 },
+                { date: '2026-03-31', status: 'EXPENSE', item: 'Night Out #1', amount: 300, notes: 'Dinner + Event', balance: 2534.24, savings: 250 },
+                { date: '2026-03-31', status: 'DEBT', item: 'LendDirect Loan (Anthony)', amount: 1010.81, notes: 'CLOSE ACCOUNT (DEBT CLEARED)', balance: 1523.43, savings: 250 },
+                { date: '2026-03-31', status: 'DEBT', item: 'LendDirectLoan (Alana)', amount: 800, notes: '60% PAID', balance: 723.43, savings: 250 },
+                { date: '2026-04-10', status: 'EXPENSE', item: 'Night Out #2', amount: 150, notes: 'Night Out Dinner', balance: 573.43, savings: 250 },
+                { date: '2026-04-10', status: 'SAVINGS', item: 'MONTHLY SAVINGS DEPOSIT', amount: 300, notes: 'SAVINGS ACCOUNT DEPOSIT', balance: 273.43, savings: 550 },
+                { date: '2026-04-15', status: 'INCOME', item: 'SignatureAce Advance', amount: 1000, notes: 'Mid Month Advance', balance: 1273.43, savings: 550 },
+                { date: '2026-04-15', status: 'EXPENSE', item: 'Gas', amount: 120, notes: 'Mid Month Gas', balance: 1153.43, savings: 550 },
+                { date: '2026-04-15', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'Mid Month Weed', balance: 1073.43, savings: 550 },
+                { date: '2026-04-15', status: 'EXPENSE', item: 'Vape', amount: 60, notes: 'E-Juice Purchase', balance: 1013.43, savings: 550 },
+                { date: '2026-04-15', status: 'EXPENSE', item: 'Car Insurance', amount: 450, notes: 'Car Insurance', balance: 563.43, savings: 500 },
+                { date: '2026-04-15', status: 'SAVINGS', item: 'Savings Deposit', amount: 150, notes: 'Savings Account Deposit', balance: 413.43, savings: 700 },
+                { date: '2026-04-15', status: 'EXPENSE', item: 'Night Out #1', amount: 150, notes: 'Dinner Out', balance: 263.43, savings: 700 },
+                { date: '2026-04-24', status: 'EXPENSE', item: 'Night Out #2', amount: 150, notes: 'Dinner Out', balance: 113.43, savings: 700 },
+                { date: '2026-04-30', status: 'INCOME', item: 'SignatureAce Monthly Pay', amount: 3228.12, notes: 'End of Month Cheque (APR)', balance: 3441.55, savings: 700 },
+                { date: '2026-04-30', status: 'EXPENSE', item: 'Gas', amount: 120, notes: 'HALF MONTH GAS', balance: 3321.55, savings: 700 },
+                { date: '2026-04-30', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'HALF MONTH WEED (1 OZ)', balance: 3241.55, savings: 700 },
+                { date: '2026-04-30', status: 'EXPENSE', item: 'Vape', amount: 60, notes: 'E-Juice Purchase', balance: 3181.55, savings: 700 },
+                { date: '2026-04-30', status: 'EXPENSE', item: 'Grocery', amount: 300, notes: 'Monthly Grocery Expense', balance: 2881.55, savings: 700 },
+                { date: '2026-04-30', status: 'EXPENSE', item: 'Night Out #1', amount: 300, notes: 'Dinner + Event', balance: 2581.55, savings: 700 },
+                { date: '2026-04-30', status: 'DEBT', item: 'LendDirect Loan (Alana)', amount: 1200, notes: 'CLOSE ACCOUNT (DEBT CLEARED)', balance: 1681.55, savings: 700 },
+                { date: '2026-04-30', status: 'SAVINGS', item: 'Monthly Savings Deposit', amount: 300, notes: 'Monthly Savings Deposit', balance: 1381.55, savings: 1000 },
+                { date: '2026-05-08', status: 'EXPENSE', item: 'Night Out #2', amount: 150, notes: 'Dinner Out', balance: 1231.55, savings: 1000 },
+                { date: '2026-05-08', status: 'DEBT', item: 'CIBC CC (Alana)', amount: 800, notes: '1/3 Paid', balance: 431.55, savings: 1000 },
+                { date: '2026-05-15', status: 'INCOME', item: 'SignatureAce Advance', amount: 1000, notes: 'Mid Month Advance', balance: 1431.55, savings: 1000 },
+                { date: '2026-05-15', status: 'EXPENSE', item: 'Car Insurance', amount: 450, notes: 'Monthly Car Insurance', balance: 981.55, savings: 1000 },
+                { date: '2026-05-15', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'Half Weed (1 OZ)', balance: 901.55, savings: 1000 },
+                { date: '2026-05-15', status: 'EXPENSE', item: 'Vape', amount: 60, notes: 'E-Juice Purchase', balance: 841.55, savings: 1000 },
+                { date: '2026-05-15', status: 'EXPENSE', item: 'Night Out #1', amount: 150, notes: 'DINNER OUT', balance: 691.55, savings: 1000 },
+                { date: '2026-05-15', status: 'SAVINGS', item: 'Savings Deposit', amount: 200, notes: 'Savings Deposit', balance: 491.55, savings: 1200 },
+                { date: '2026-05-22', status: 'EXPENSE', item: 'Night Out #2', amount: 150, notes: 'DINNER OUT', balance: 341.55, savings: 1200 },
+                { date: '2026-05-29', status: 'INCOME', item: 'SignatureAce Monthly Pay', amount: 3228.12, notes: 'MONTHLY CHEQUE', balance: 3569.67, savings: 1200 },
+                { date: '2026-05-29', status: 'EXPENSE', item: 'Gas', amount: 120, notes: 'GAS 1/2', balance: 3449.67, savings: 1200 },
+                { date: '2026-05-29', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'WEED 1/2', balance: 3369.67, savings: 1200 },
+                { date: '2026-05-29', status: 'EXPENSE', item: 'Grocery', amount: 300, notes: 'MONTHLY GROCERY Expense', balance: 3069.67, savings: 1200 },
+                { date: '2026-05-29', status: 'EXPENSE', item: 'Vape', amount: 60, notes: 'E-Juice Purchase', balance: 3009.67, savings: 1200 },
+                { date: '2026-05-29', status: 'EXPENSE', item: 'Night Out #1', amount: 300, notes: 'DINNER + EVENT', balance: 2709.67, savings: 1200 },
+                { date: '2026-05-29', status: 'DEBT', item: 'CIBC CC (Alana)', amount: 800, notes: '2/3 PAID', balance: 1909.67, savings: 1200 },
+                { date: '2026-05-29', status: 'SAVINGS', item: 'SAVINGS DEPOSIT', amount: 300, notes: 'SAVINGS DEPOSIT', balance: 1609.67, savings: 1500 },
+                { date: '2026-06-05', status: 'EXPENSE', item: 'Night Out #2', amount: 150, notes: 'Dinner Out', balance: 1459.67, savings: 1500 },
+                { date: '2026-06-15', status: 'INCOME', item: 'SignatureAce Advance', amount: 1000, notes: 'MONTHLY ADVANCE', balance: 2459.67, savings: 1500 },
+                { date: '2026-06-15', status: 'EXPENSE', item: 'Car Insurance', amount: 450, notes: 'Car Insurance', balance: 2009.67, savings: 1500 },
+                { date: '2026-06-15', status: 'EXPENSE', item: 'Gas', amount: 120, notes: 'Gas 1/2', balance: 1889.67, savings: 1500 },
+                { date: '2026-06-15', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'Weed 1/2', balance: 1809.67, savings: 1500 },
+                { date: '2026-06-15', status: 'EXPENSE', item: 'Vape', amount: 60, notes: 'Vape 1/2', balance: 1749.67, savings: 1500 },
+                { date: '2026-06-15', status: 'EXPENSE', item: 'Night Out #1', amount: 150, notes: 'Dinner Out', balance: 1599.67, savings: 1500 },
+                { date: '2026-06-15', status: 'SAVINGS', item: 'Savings Deposit', amount: 250, notes: 'Savings Deposit', balance: 1349.67, savings: 1750 },
+                { date: '2026-06-26', status: 'EXPENSE', item: 'Night Out #2', amount: 150, notes: 'Dinner Out', balance: 1199.67, savings: 1750 },
+                { date: '2026-06-30', status: 'INCOME', item: 'SignatureAce Pay', amount: 3228.12, notes: 'PAYDAY', balance: 4427.79, savings: 1750 },
+                { date: '2026-06-30', status: 'EXPENSE', item: 'Gas', amount: 120, notes: 'Gas 1/2', balance: 4307.79, savings: 1750 },
+                { date: '2026-06-30', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'Weed 1/2', balance: 4227.79, savings: 1750 },
+                { date: '2026-06-30', status: 'EXPENSE', item: 'Vape', amount: 60, notes: 'Vape 1/2', balance: 4167.79, savings: 1750 },
+                { date: '2026-06-30', status: 'EXPENSE', item: 'Grocery', amount: 300, notes: 'Monthly Grocery Expense', balance: 3867.79, savings: 1750 },
+                { date: '2026-06-30', status: 'DEBT', item: 'CIBC CC (Alana)', amount: 800, notes: 'CLOSE ACCOUNT - DEBT CLEARED', balance: 3067.79, savings: 1750 },
+                { date: '2026-06-30', status: 'EXPENSE', item: 'Night Out #1', amount: 300, notes: 'DINNER + EVENT', balance: 2767.79, savings: 1750 },
+                { date: '2026-06-30', status: 'SAVINGS', item: 'Savings Deposit', amount: 250, notes: 'SAVINGS DEPOSIT', balance: 2517.79, savings: 2000 },
+                { date: '2026-07-10', status: 'EXPENSE', item: 'Night Out #2', amount: 150, notes: 'DINNER OUT', balance: 2367.79, savings: 2000 },
+                { date: '2026-07-15', status: 'INCOME', item: 'SignatureAce Advance', amount: 1000, notes: 'ADVANCE', balance: 3367.79, savings: 2000 },
+                { date: '2026-07-15', status: 'EXPENSE', item: 'Car Insurance', amount: 450, notes: 'Car Insurance', balance: 2917.79, savings: 2000 },
+                { date: '2026-07-15', status: 'EXPENSE', item: 'Gas', amount: 120, notes: 'GAS 1/2', balance: 2797.79, savings: 2000 },
+                { date: '2026-07-15', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'WEED 1/2', balance: 2717.79, savings: 2000 },
+                { date: '2026-07-15', status: 'EXPENSE', item: 'Vape', amount: 60, notes: 'VAPE 1/2', balance: 2657.79, savings: 2000 },
+                { date: '2026-07-15', status: 'EXPENSE', item: 'Night Out #1', amount: 150, notes: 'DINNER OUT', balance: 2507.79, savings: 2000 },
+                { date: '2026-07-15', status: 'SAVINGS', item: 'SAVINGS DEPOSIT', amount: 500, notes: 'SAVINGS DEPOSIT', balance: 2007.79, savings: 2500 },
+                { date: '2026-07-24', status: 'EXPENSE', item: 'Night Out #2', amount: 150, notes: 'DINNER OUT', balance: 1857.79, savings: 2500 },
+                { date: '2026-07-31', status: 'INCOME', item: 'SignatureAce Pay', amount: 3228.12, notes: 'SignatureAce Pay', balance: 5085.91, savings: 2500 },
+                { date: '2026-07-31', status: 'EXPENSE', item: 'Grocery', amount: 300, notes: 'Grocery Expenses', balance: 4785.91, savings: 2500 },
+                { date: '2026-07-31', status: 'EXPENSE', item: 'Gas', amount: 120, notes: 'GAS 1/2', balance: 4665.91, savings: 2500 },
+                { date: '2026-07-31', status: 'EXPENSE', item: 'Weed', amount: 80, notes: 'WEED 1/2', balance: 4585.91, savings: 2500 },
+                { date: '2026-07-31', status: 'EXPENSE', item: 'Vape', amount: 60, notes: 'VAPE 1/2', balance: 4525.91, savings: 2500 },
+                { date: '2026-07-31', status: 'SAVINGS', item: 'SAVINGS DEPOSIT', amount: 500, notes: 'SAVINGS DEPOSIT', balance: 4025.91, savings: 3000 },
+                { date: '2026-08-01', status: 'EXPENSE', item: 'MOVE OUT DATE', amount: 0, notes: 'MOVE OUT DATE', balance: 4025.91, savings: 3000 }
+            ];
+
+            // Store plan data in app state for filtering
+            window.appState.planFilters.planData = planData;
+
+            // Render the table with current filters
+            renderPlanTable();
+        }
+
+        // Render Plan Table with filters applied
+        function renderPlanTable() {
+            const planData = window.appState.planFilters.planData;
+            const selectedMonths = window.appState.planFilters.selectedMonths;
+            const tbody = document.getElementById('planTableBody');
+            
+            if (!planData || planData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-secondary);">No plan data available</td></tr>';
+                return;
+            }
+
+            // Filter data based on selected months
+            let filteredData = planData;
+            if (!selectedMonths.includes('all')) {
+                filteredData = planData.filter(row => {
+                    const rowMonth = row.date.substring(0, 7); // Extract YYYY-MM
+                    return selectedMonths.includes(rowMonth);
+                });
+            }
+
+            // Update filter summary
+            updatePlanFilterSummary(filteredData.length, planData.length);
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-secondary);">No transactions match the selected months</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredData.map(row => {
+                const statusClass = row.status.toLowerCase();
+                const isDebtCleared = row.notes && (row.notes.includes('CLOSE ACCOUNT') || row.notes.includes('DEBT CLEARED') || row.notes.includes('DEBT CLEAR'));
+                const isMoveOut = row.item === 'MOVE OUT DATE';
+                const rowClass = (isDebtCleared || isMoveOut) ? 'milestone-row' : '';
+                
+                // Format date
+                const date = new Date(row.date);
+                const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                
+                // Determine amount color
+                let amountColor = 'var(--text-primary)';
+                if (row.status === 'INCOME' || row.status === 'SAVINGS') {
+                    amountColor = 'var(--success)';
+                } else if (row.status === 'DEBT' || row.status === 'EXPENSE') {
+                    amountColor = 'var(--danger)';
+                }
+                
+                return `
+                    <tr class="${rowClass}">
+                        <td style="white-space: nowrap; font-size: 13px; color: var(--text-secondary);">${formattedDate}</td>
+                        <td style="text-align: center;">
+                            <span class="status-badge ${statusClass}">
+                                ${row.status === 'INCOME' ? '💰' : row.status === 'DEBT' ? '💳' : row.status === 'SAVINGS' ? '💎' : '💸'} ${row.status}
+                            </span>
+                        </td>
+                        <td style="font-weight: 500;">${row.item}</td>
+                        <td class="amount-cell" style="text-align: right; color: ${amountColor};">
+                            ${row.amount > 0 ? `$${row.amount.toFixed(2)}` : '-'}
+                        </td>
+                        <td style="font-size: 13px; color: var(--text-secondary); max-width: 250px;">
+                            ${row.notes}
+                            ${isDebtCleared ? ' 🎉' : ''}
+                        </td>
+                        <td class="balance-cell" style="text-align: right; color: var(--primary-light);">
+                            $${row.balance.toFixed(2)}
+                        </td>
+                        <td class="balance-cell" style="text-align: right; color: var(--info);">
+                            $${row.savings.toFixed(2)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Toggle month filter
+        window.togglePlanMonth = function(month) {
+            const selectedMonths = window.appState.planFilters.selectedMonths;
+            
+            if (month === 'all') {
+                // Clear all filters and select all
+                window.appState.planFilters.selectedMonths = ['all'];
+            } else {
+                // Remove 'all' if it's selected
+                const allIndex = selectedMonths.indexOf('all');
+                if (allIndex > -1) {
+                    selectedMonths.splice(allIndex, 1);
+                }
+                
+                // Toggle the specific month
+                const monthIndex = selectedMonths.indexOf(month);
+                if (monthIndex > -1) {
+                    // Remove if already selected
+                    selectedMonths.splice(monthIndex, 1);
+                    // If no months selected, default to 'all'
+                    if (selectedMonths.length === 0) {
+                        selectedMonths.push('all');
+                    }
+                } else {
+                    // Add the month
+                    selectedMonths.push(month);
+                }
+            }
+            
+            // Update button states
+            updatePlanFilterButtons();
+            
+            // Re-render the table
+            renderPlanTable();
+        };
+
+        // Clear all plan filters
+        window.clearPlanFilters = function() {
+            window.appState.planFilters.selectedMonths = ['all'];
+            updatePlanFilterButtons();
+            renderPlanTable();
+        };
+
+        // Update filter button states
+        function updatePlanFilterButtons() {
+            const selectedMonths = window.appState.planFilters.selectedMonths;
+            document.querySelectorAll('.month-filter-btn').forEach(btn => {
+                const month = btn.getAttribute('data-month');
+                if (selectedMonths.includes(month)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Update plan filter summary text
+        function updatePlanFilterSummary(filteredCount, totalCount) {
+            const summary = document.getElementById('planFilterSummary');
+            const selectedMonths = window.appState.planFilters.selectedMonths;
+            
+            if (selectedMonths.includes('all')) {
+                summary.textContent = `Showing all months (${totalCount} transactions)`;
+            } else {
+                const monthNames = selectedMonths.map(m => {
+                    const date = new Date(m + '-01');
+                    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                }).join(', ');
+                summary.textContent = `Showing ${filteredCount} of ${totalCount} transactions from: ${monthNames}`;
+            }
+        }
 
         // Initialize app on load
         initApp();
