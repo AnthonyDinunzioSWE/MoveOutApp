@@ -769,6 +769,15 @@
             th, td {
                 padding: 8px;
             }
+
+            .order-row .form-row,
+            .order-row > div[style*="grid"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
         }
 
         .hidden {
@@ -806,6 +815,49 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
+        }
+
+        /* Order Row Styling */
+        .order-row {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .order-row input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .order-row label {
+            cursor: pointer;
+        }
+
+        /* Custom Scrollbar for Orders Container */
+        #ordersContainer::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #ordersContainer::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 4px;
+        }
+
+        #ordersContainer::-webkit-scrollbar-thumb {
+            background: var(--bg-hover);
+            border-radius: 4px;
+        }
+
+        #ordersContainer::-webkit-scrollbar-thumb:hover {
+            background: var(--border-light);
         }
 
         /* Status Badge */
@@ -1797,12 +1849,25 @@
                                 <label>Notes</label>
                                 <textarea id="dashNotes" rows="3" placeholder="Performance notes, improvements, etc."></textarea>
                             </div>
-                            <div class="form-group">
-                                <label>Orders (JSON format - optional)</label>
-                                <textarea id="dashOrders" rows="6" placeholder='[{"restaurant": "Superstore", "estimated": 7.50, "actual": 7.00, "distance": 4.4, "time": "5:59 PM - 6:11 PM"}]'></textarea>
-                                <small style="color: var(--text-secondary); display: block; margin-top: 4px;">Leave empty if you don't want to track individual orders</small>
+                            
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid var(--border);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                    <h3 style="margin: 0; color: var(--text-primary);">📦 Orders (Optional)</h3>
+                                    <button type="button" class="btn btn-info" onclick="addOrderRow()" style="padding: 8px 16px;">
+                                        + Add Order
+                                    </button>
+                                </div>
+                                <div id="ordersContainer" style="max-height: 400px; overflow-y: auto; padding-right: 4px;">
+                                    <p style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                                        Click "Add Order" to track individual orders
+                                    </p>
+                                </div>
+                                <p style="margin-top: 12px; font-size: 12px; color: var(--text-secondary); text-align: center;">
+                                    💡 Tip: Add each order as you complete it, or add them all at the end of your shift
+                                </p>
                             </div>
-                            <button type="submit" class="btn btn-success">Add Shift</button>
+                            
+                            <button type="submit" class="btn btn-success" style="margin-top: 24px;">Add Shift</button>
                         </form>
                     `;
                     // Set today's date as default
@@ -1925,23 +1990,39 @@
             const earnings = parseFloat(document.getElementById('dashEarnings').value);
             const km = parseFloat(document.getElementById('dashKM').value);
             const notes = document.getElementById('dashNotes').value;
-            const ordersJson = document.getElementById('dashOrders').value;
 
             // Calculate hours
             const start = new Date(`2000-01-01 ${startTime}`);
             const end = new Date(`2000-01-01 ${endTime}`);
             const hours = (end - start) / (1000 * 60 * 60);
 
-            // Parse orders if provided
-            let orders = [];
-            if (ordersJson.trim()) {
-                try {
-                    orders = JSON.parse(ordersJson);
-                } catch (e) {
-                    alert('Invalid orders JSON format');
-                    return;
+            // Collect orders from form fields
+            const orders = [];
+            const orderRows = document.querySelectorAll('.order-row');
+            orderRows.forEach(row => {
+                const restaurant = row.querySelector('.order-restaurant').value;
+                const estimated = parseFloat(row.querySelector('.order-estimated').value) || 0;
+                const actual = parseFloat(row.querySelector('.order-actual').value) || 0;
+                const distance = parseFloat(row.querySelector('.order-distance').value) || 0;
+                const time = row.querySelector('.order-time').value;
+                const declined = row.querySelector('.order-declined').checked;
+                const reason = row.querySelector('.order-reason').value;
+
+                if (restaurant) {
+                    const order = {
+                        restaurant,
+                        estimated,
+                        actual,
+                        distance,
+                        time
+                    };
+                    if (declined) {
+                        order.declined = true;
+                        if (reason) order.reason = reason;
+                    }
+                    orders.push(order);
                 }
-            }
+            });
 
             const shift = {
                 date,
@@ -1986,6 +2067,102 @@
             } catch (error) {
                 console.error('Error adding DoorDash shift:', error);
                 alert('Failed to add shift');
+            }
+        };
+
+        // Add order row to DoorDash form
+        window.addOrderRow = function() {
+            const container = document.getElementById('ordersContainer');
+            
+            // Remove placeholder text if this is the first order
+            if (container.querySelector('p')) {
+                container.innerHTML = '';
+            }
+
+            const orderNum = container.querySelectorAll('.order-row').length + 1;
+            const orderRow = document.createElement('div');
+            orderRow.className = 'order-row';
+            orderRow.style.cssText = 'background: var(--bg-tertiary); padding: 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border);';
+            
+            orderRow.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 style="margin: 0; color: var(--text-primary); font-size: 14px;">Order #${orderNum}</h4>
+                    <button type="button" onclick="removeOrderRow(this)" style="background: var(--danger); color: white; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+                        Remove
+                    </button>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label style="font-size: 13px;">Restaurant / Store Name</label>
+                    <input type="text" class="order-restaurant" placeholder="e.g., McDonald's, Superstore" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary);">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label style="font-size: 13px;">Estimated $</label>
+                        <input type="number" step="0.01" class="order-estimated" placeholder="0.00" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary);">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size: 13px;">Actual $</label>
+                        <input type="number" step="0.01" class="order-actual" placeholder="0.00" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary);">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size: 13px;">Distance (km)</label>
+                        <input type="number" step="0.1" class="order-distance" placeholder="0.0" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary);">
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label style="font-size: 13px;">Time (e.g., 5:59 PM - 6:11 PM)</label>
+                    <input type="text" class="order-time" placeholder="5:59 PM - 6:11 PM" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary);">
+                </div>
+                
+                <div style="background: var(--bg-primary); padding: 12px; border-radius: 6px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 8px;">
+                        <input type="checkbox" class="order-declined" onchange="toggleDeclineReason(this)" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
+                        <span style="color: var(--text-primary); font-weight: 600;">I declined this order</span>
+                    </label>
+                    <div class="decline-reason-group" style="display: none;">
+                        <label style="font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 4px;">Why did you decline?</label>
+                        <input type="text" class="order-reason" placeholder="e.g., Too far, Low pay, Wrong direction" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); font-size: 13px;">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(orderRow);
+            
+            // Auto-focus on restaurant name field
+            setTimeout(() => {
+                orderRow.querySelector('.order-restaurant').focus();
+            }, 100);
+        };
+
+        // Remove order row
+        window.removeOrderRow = function(button) {
+            const orderRow = button.closest('.order-row');
+            const container = document.getElementById('ordersContainer');
+            orderRow.remove();
+            
+            // Renumber remaining orders
+            const remainingOrders = container.querySelectorAll('.order-row');
+            remainingOrders.forEach((row, index) => {
+                row.querySelector('h4').textContent = `Order #${index + 1}`;
+            });
+            
+            // Show placeholder if no orders left
+            if (remainingOrders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">Click "Add Order" to track individual orders</p>';
+            }
+        };
+
+        // Toggle decline reason field
+        window.toggleDeclineReason = function(checkbox) {
+            const reasonGroup = checkbox.closest('.order-row').querySelector('.decline-reason-group');
+            if (checkbox.checked) {
+                reasonGroup.style.display = 'block';
+            } else {
+                reasonGroup.style.display = 'none';
+                reasonGroup.querySelector('.order-reason').value = '';
             }
         };
 
