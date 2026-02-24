@@ -1201,23 +1201,26 @@
 
             try {
                 // Load data first
-                const { doc, getDoc } = window.firestoreModules;
-                const dataDoc = await getDoc(doc(window.db, 'appData', 'main'));
+                const { doc, getDoc, setDoc } = window.firestoreModules;
+                let dataDoc = await getDoc(doc(window.db, 'appData', 'main'));
                 
-                if (dataDoc.exists()) {
-                    const data = dataDoc.data();
-                    
-                    if (data.users[username] && data.users[username].password === password) {
-                        window.appState.currentUser = username;
-                        sessionStorage.setItem('currentUser', username);
-                        window.appState.data = data;
-                        await loadDataFromFirestore();
-                        showDashboard();
-                    } else {
-                        showAlert('error', 'Invalid username or password');
-                    }
+                // Initialize database if it doesn't exist
+                if (!dataDoc.exists()) {
+                    console.log('Initializing database with default data...');
+                    await setDoc(doc(window.db, 'appData', 'main'), INITIAL_DATA);
+                    dataDoc = await getDoc(doc(window.db, 'appData', 'main'));
+                }
+                
+                const data = dataDoc.data();
+                
+                if (data.users[username] && data.users[username].password === password) {
+                    window.appState.currentUser = username;
+                    sessionStorage.setItem('currentUser', username);
+                    window.appState.data = data;
+                    await loadDataFromFirestore();
+                    showDashboard();
                 } else {
-                    showAlert('error', 'Database not initialized');
+                    showAlert('error', 'Invalid username or password');
                 }
             } catch (error) {
                 console.error('Login error:', error);
